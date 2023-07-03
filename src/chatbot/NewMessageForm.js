@@ -36,7 +36,12 @@ const NewMessageForm = ({ onSubmit = () => {} }) => {
     <Form>
       <NewMessageInput
         value={newMessage}
-        onChange={e => setNewMessage(e.target.value)} />
+        onChange={e => setNewMessage(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter') {
+            submitForm();
+          }
+        }} />
       <SendButton onClick={submitForm}>Send</SendButton>
     </Form>
   );
