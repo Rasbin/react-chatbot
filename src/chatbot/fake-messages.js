@@ -20,4 +20,18 @@ export const fakeMessages = [{
   from: 'Joe',
   text: 'Hello, I\'m here to help!',
   sentAt: new Date(),
+},, {
+  from: 'Joe',
+  isUnread: true,
+  text: 'Great, what is your question?',
+  sentAt: new Date(),
+}, {
+  from: 'Joe',
+  isUnread: true,
+  text: 'Hello? You still there?',
+  sentAt: new Date(),
+}, {
+  from: 'Joe',
+  text: 'Hello, I\'m here to help!',
+  sentAt: new Date(),
 }]
