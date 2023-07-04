@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import socketIoClient from 'socket.io-client';
 import { fakeMessages } from './fake-messages';
 import FloatingButton from './FloatingButton';
 import MessageList from './MessagesList';
@@ -37,6 +38,7 @@ const MessagesSection = styled.div`
 const Chatbot = () => {
   const [messages, setMessages] = useState(fakeMessages);
   const [windowIsOpen, setWindowIsOpen] = useState(false);
+  const [socket, setSocket] = useState(null);
 
   const bottomOfMessagesRef = useRef(null);
 
@@ -47,6 +49,15 @@ const Chatbot = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    const newSocket = socketIoClient('http://127.0.0.1:8080');
+    setSocket(newSocket);
+
+    return  () => {
+      newSocket.disconnect();
+    }
+  }, []);
 
   useEffect(() => {
     if (windowIsOpen) {
