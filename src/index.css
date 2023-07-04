@@ -11,3 +11,13 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.chatbot-primary {
+  background-color: lightseagreen;
+  color: black;
+}
+
+.chatbot-secondary {
+  background-color: tomato;
+  color: white;
+}

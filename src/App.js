@@ -5,7 +5,11 @@ import './App.css';
 function App() {
   return (
     <>
-      <Chatbot />
+      <Chatbot
+        primaryColor='#e5d4ed'
+        secondaryColor='#6d72c3'
+        primaryTextColor='black'
+        secondaryTextColor='white' />
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />

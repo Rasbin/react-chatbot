@@ -27,30 +27,28 @@ const MessageBase = styled.span`
 `;
 
 const UserMessage = styled(MessageBase)`
-  background-color: #333;
-  color: white;
 `;
 
 const NonUserMessage = styled(MessageBase)`
-  background-color: #aaa;
-  color: white;
 `;
 
-const MessageList = ({ messages }) => {
+const MessageList = ({
+  messages,
+}) => {
   return (
     <Container>
       { messages.map(message => {
         if (message.isUser) {
           return (
             <UserMessageWrap>
-              <UserMessage>{message.text}</UserMessage>
+              <UserMessage className='chatbot-primary'>{message.text}</UserMessage>
             </UserMessageWrap>
           )
         }
 
         return (
           <NonUserMessageWrap>
-            <NonUserMessage>{message.text}</NonUserMessage>
+            <NonUserMessage className='chatbot-secondary'>{message.text}</NonUserMessage>
           </NonUserMessageWrap>
         )
       }) }

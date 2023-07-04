@@ -10,8 +10,6 @@ const Button = styled.button`
   width: 72px;
   border-radius: 50%;
   text-align: center;
-  background-color: white;
-  color: black;
   cursor: pointer;
 `;
 
@@ -28,9 +26,15 @@ const NotificationBadge = styled.span`
   font-weight: bold;
 `;
 
-const FloatingButton = ({ unreadCount = 0, onClick = () => {} }) => {
+const FloatingButton = ({
+    unreadCount = 0,
+    onClick = () => {},
+}) => {
   return (
-    <Button onClick={onClick}>
+    <Button
+      className='chatbot-primary'
+      onClick={onClick}
+    >
       <FontAwesomeIcon icon={faMessage} size='2x' />
       { unreadCount > 0 && <NotificationBadge>{unreadCount}</NotificationBadge> }
     </Button>

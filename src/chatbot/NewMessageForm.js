@@ -17,14 +17,16 @@ const NewMessageInput = styled.input`
 `;
 
 const SendButton = styled.button`
-  background-color: grey;
-  color: white;
   border-radius: 8px;
   font-size: 16px;
   padding: 8px;
 `;
 
-const NewMessageForm = ({ onSubmit = () => {} }) => {
+const NewMessageForm = ({
+  onSubmit = () => {},
+  primaryColor,
+  primaryTextColor,
+}) => {
   const [newMessage, setNewMessage] = useState('');
 
   const submitForm = () => {
@@ -42,7 +44,9 @@ const NewMessageForm = ({ onSubmit = () => {} }) => {
             submitForm();
           }
         }} />
-      <SendButton onClick={submitForm}>Send</SendButton>
+      <SendButton
+        className='chatbot-primary'
+        onClick={submitForm}>Send</SendButton>
     </Form>
   );
 }
