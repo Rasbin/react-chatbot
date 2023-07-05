@@ -36,6 +36,8 @@ const MessagesSection = styled.div`
 `;
 
 const Chatbot = () => {
+  const [isTyping, setIsTyping] = useState(false);
+  const [otherName, setOtherName] = useState('');
   const [messages, setMessages] = useState([]);
   const [windowIsOpen, setWindowIsOpen] = useState(false);
   const [socket, setSocket] = useState(null);
@@ -54,8 +56,6 @@ const Chatbot = () => {
     const newSocket = socketIoClient('http://127.0.0.1:8080');
     setSocket(newSocket);
 
-    
-
     return  () => {
       newSocket.disconnect();
     }
@@ -64,10 +64,26 @@ const Chatbot = () => {
   useEffect(() => {
     socket?.on('GREETING', newMessage => {
       setMessages(messages.concat(newMessage));
+      setOtherName(newMessage.from);
+    });
+
+    socket?.on('MESSAGE_READ', () => {
+      setMessages(messages.map(message => {
+        if (message.isUser) {
+          return { ...message, isUnread: false };
+        }
+
+        return message;
+      }));
+    });
+
+    socket?.on('IS_TYPING', () => {
+      setIsTyping(true);
     });
 
     socket?.on('NEW_MESSAGE', newMessage => {
       setMessages(messages.concat(newMessage));
+      setIsTyping(false);
     });
   }, [socket, messages]);
 
@@ -86,6 +102,7 @@ const Chatbot = () => {
     const newMessage = {
       text,
       isUser: true,
+      isUnread: true,
       sentAt: new Date(),
     };
 
@@ -99,7 +116,11 @@ const Chatbot = () => {
     <FloatingContainer>
       { windowIsOpen && <FloatingWindow >
           <MessagesSection>
-            <MessageList messages={messages} />
+            <MessageList
+              messages={messages}
+              isTyping={isTyping}
+              botName={otherName}
+            />
             <div ref={bottomOfMessagesRef}></div>
           </MessagesSection>
           <NewMessageForm onSubmit={addNewMessage} />

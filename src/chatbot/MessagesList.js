@@ -34,6 +34,8 @@ const NonUserMessage = styled(MessageBase)`
 
 const MessageList = ({
   messages,
+  isTyping,
+  botName,
 }) => {
   return (
     <Container>
@@ -42,6 +44,7 @@ const MessageList = ({
           return (
             <UserMessageWrap>
               <UserMessage className='chatbot-primary'>{message.text}</UserMessage>
+              { message.isUnread ? null : <div>Read</div> }
             </UserMessageWrap>
           )
         }
@@ -52,6 +55,7 @@ const MessageList = ({
           </NonUserMessageWrap>
         )
       }) }
+      { isTyping && <div>{botName} is typing...</div> }
     </Container>
   );
 }

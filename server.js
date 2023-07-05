@@ -11,6 +11,10 @@ const io = new Server(server, {
   }
 });
 
+function randomInRange(min, max) {
+  return min + (Math.random() * (max - min));
+}
+
 io.on('connection', socket => {
   console.log('A new client has connected!');
 
@@ -21,9 +25,17 @@ io.on('connection', socket => {
       sentAt: new Date(),
       isUnread: true,
     });
-  }, 3000);
+  }, randomInRange(1500, 4000));
 
   socket.on('NEW_MESSAGE', message => {
+    setTimeout(() => {
+      socket.emit('MESSAGE_READ');
+    }, randomInRange(1000, 3000));
+
+    setTimeout(() => {
+      socket.emit('IS_TYPING', 'Joe');
+    }, randomInRange(3000, 5000));
+
     setTimeout(() => {
       socket.emit('NEW_MESSAGE', {
         from: 'Joe',
@@ -31,7 +43,7 @@ io.on('connection', socket => {
         sentAt: new Date(),
         isUnread: true,
       });
-    }, 3000);
+    }, randomInRange(5000, 6000));
   })
 
   
