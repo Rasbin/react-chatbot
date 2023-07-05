@@ -36,7 +36,7 @@ const MessagesSection = styled.div`
 `;
 
 const Chatbot = () => {
-  const [messages, setMessages] = useState(fakeMessages);
+  const [messages, setMessages] = useState([]);
   const [windowIsOpen, setWindowIsOpen] = useState(false);
   const [socket, setSocket] = useState(null);
 
@@ -54,10 +54,22 @@ const Chatbot = () => {
     const newSocket = socketIoClient('http://127.0.0.1:8080');
     setSocket(newSocket);
 
+    
+
     return  () => {
       newSocket.disconnect();
     }
   }, []);
+
+  useEffect(() => {
+    socket?.on('GREETING', newMessage => {
+      setMessages(messages.concat(newMessage));
+    });
+
+    socket?.on('NEW_MESSAGE', newMessage => {
+      setMessages(messages.concat(newMessage));
+    });
+  }, [socket, messages]);
 
   useEffect(() => {
     if (windowIsOpen) {
@@ -71,12 +83,16 @@ const Chatbot = () => {
   const unreadMessages = messages.filter(m => m.isUnread);
 
   const addNewMessage = ( text ) => {
-    scrollToBottom();
-    setMessages(messages.concat({
+    const newMessage = {
       text,
       isUser: true,
       sentAt: new Date(),
-    }))
+    };
+
+    scrollToBottom();
+    setMessages(messages.concat(newMessage));
+
+    socket?.emit('NEW_MESSAGE', newMessage);
   }
 
   return (
