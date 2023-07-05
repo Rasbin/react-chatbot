@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const { v4: uuid } = require('uuid');
 
 const app = express();
 const server = http.createServer(app);
@@ -15,19 +16,28 @@ function randomInRange(min, max) {
   return min + (Math.random() * (max - min));
 }
 
+let conversations = {};
+
 io.on('connection', socket => {
+  const newClientId = uuid();
   console.log('A new client has connected!');
 
   setTimeout(() => {
-    socket.emit('GREETING', {
+    const newMessage = {
       from: 'Joe',
       text: 'Hello I am here to help you. What is your question?',
       sentAt: new Date(),
       isUnread: true,
-    });
+    };
+
+    socket.emit('GREETING', newMessage);
+    conversations[newClientId] = [newMessage];
   }, randomInRange(1500, 4000));
 
-  socket.on('NEW_MESSAGE', message => {
+  socket.on('NEW_MESSAGE', newMessage => {
+    conversations[newClientId].push(newMessage);
+    console.log(conversations);
+
     setTimeout(() => {
       socket.emit('MESSAGE_READ');
     }, randomInRange(1000, 3000));
@@ -37,12 +47,16 @@ io.on('connection', socket => {
     }, randomInRange(3000, 5000));
 
     setTimeout(() => {
-      socket.emit('NEW_MESSAGE', {
+      const newMessage = {
         from: 'Joe',
         text: 'That\'s a great question! Let me get someone to help you.',
         sentAt: new Date(),
         isUnread: true,
-      });
+      }
+
+      socket.emit('NEW_MESSAGE', newMessage);
+
+      conversations[newClientId].push(newMessage);
     }, randomInRange(5000, 6000));
   })
 
