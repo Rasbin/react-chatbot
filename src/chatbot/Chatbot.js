@@ -32,6 +32,7 @@ const FloatingContainer = styled.div`
 const MessagesSection = styled.div`
   overflow: auto;
   padding: 8px;
+  padding-bottom: 20px;
   flex: 1;
 `;
 
@@ -67,6 +68,10 @@ const Chatbot = () => {
     }
   }, []);
 
+  const markMessagesAsRead = () => {
+    socket?.emit('MARK_ALL_AS_READ');
+  }
+
   useEffect(() => {
     socket?.on('ID_ASSIGNED', newId => {
       localStorage.setItem('chatbot-id', newId);
@@ -74,6 +79,8 @@ const Chatbot = () => {
 
     socket?.on('EXISTING_MESSAGES', messages => {
       setMessages(messages);
+      const lastBotMessage = messages.find(message => message.from);
+      setOtherName(lastBotMessage ? lastBotMessage.from : 'The agent is typing...');
     });
 
     socket?.on('GREETING', newMessage => {
@@ -96,10 +103,14 @@ const Chatbot = () => {
     });
 
     socket?.on('NEW_MESSAGE', newMessage => {
-      setMessages(messages.concat(newMessage));
+      setMessages(messages.concat({
+        ...newMessage,
+        isUnread: !windowIsOpen,
+      }));
       setIsTyping(false);
+      markMessagesAsRead();
     });
-  }, [socket, messages]);
+  }, [socket, messages, windowIsOpen]);
 
   useEffect(() => {
     if (windowIsOpen) {
@@ -107,10 +118,11 @@ const Chatbot = () => {
         ...message,
         isUnread: false,
       })))
+      markMessagesAsRead();
     }
   }, [windowIsOpen]);
 
-  const unreadMessages = messages.filter(m => m.isUnread);
+  const unreadMessages = messages.filter(m => m.isUnread && !m.isUser);
 
   const addNewMessage = ( text ) => {
     const newMessage = {

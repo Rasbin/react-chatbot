@@ -49,6 +49,14 @@ io.on('connection', socket => {
     }, randomInRange(1500, 4000));
   }
   
+  let goodQuestionResponseTimeOut;
+
+  socket.on('MARK_ALL_AS_READ', () => {
+    conversations[clientId] = (conversations[clientId] || []).map(message => ({
+      ...message,
+      isUnread: false,
+    }))
+  });
 
   socket.on('NEW_MESSAGE', newMessage => {
     conversations[clientId] = conversations[clientId]
@@ -64,7 +72,11 @@ io.on('connection', socket => {
       socket.emit('IS_TYPING', 'Joe');
     }, randomInRange(3000, 5000));
 
-    setTimeout(() => {
+    if (goodQuestionResponseTimeOut) {
+      clearTimeout(goodQuestionResponseTimeOut);
+    }
+
+    goodQuestionResponseTimeOut = setTimeout(() => {
       const newMessage = {
         from: 'Joe',
         text: 'That\'s a great question! Let me get someone to help you.',
@@ -75,6 +87,8 @@ io.on('connection', socket => {
       socket.emit('NEW_MESSAGE', newMessage);
 
       conversations[clientId].push(newMessage);
+
+      goodQuestionResponseTimeOut = undefined;
     }, randomInRange(5000, 6000));
   })
 
