@@ -53,7 +53,13 @@ const Chatbot = () => {
   }, [messages]);
 
   useEffect(() => {
-    const newSocket = socketIoClient('http://127.0.0.1:8080');
+    const chatbotId = localStorage.getItem('chatbot-id');
+
+    const newSocket = socketIoClient('http://127.0.0.1:8080', {
+      query: {
+        id: chatbotId,
+      }
+    });
     setSocket(newSocket);
 
     return  () => {
@@ -62,6 +68,14 @@ const Chatbot = () => {
   }, []);
 
   useEffect(() => {
+    socket?.on('ID_ASSIGNED', newId => {
+      localStorage.setItem('chatbot-id', newId);
+    });
+
+    socket?.on('EXISTING_MESSAGES', messages => {
+      setMessages(messages);
+    });
+
     socket?.on('GREETING', newMessage => {
       setMessages(messages.concat(newMessage));
       setOtherName(newMessage.from);

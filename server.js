@@ -19,23 +19,41 @@ function randomInRange(min, max) {
 let conversations = {};
 
 io.on('connection', socket => {
-  const newClientId = uuid();
-  console.log('A new client has connected!');
-
-  setTimeout(() => {
-    const newMessage = {
-      from: 'Joe',
-      text: 'Hello I am here to help you. What is your question?',
-      sentAt: new Date(),
-      isUnread: true,
-    };
-
-    socket.emit('GREETING', newMessage);
-    conversations[newClientId] = [newMessage];
-  }, randomInRange(1500, 4000));
+  const existingClientId = socket.handshake.query.id;
+  let clientId;
+  
+  if (existingClientId) {
+    console.log('An existing client has joined with id ' + existingClientId);
+    clientId = existingClientId;
+    const existingMessages = conversations[existingClientId];
+    
+    if (existingMessages) {
+      socket.emit('EXISTING_MESSAGES', existingMessages);
+    }
+  } else {
+    console.log('A new client has connected!');
+    const newClientId = uuid();
+    clientId = newClientId;
+    socket.emit('ID_ASSIGNED', newClientId);
+  
+    setTimeout(() => {
+      const newMessage = {
+        from: 'Joe',
+        text: 'Hello I am here to help you. What is your question?',
+        sentAt: new Date(),
+        isUnread: true,
+      };
+  
+      socket.emit('GREETING', newMessage);
+      conversations[newClientId] = [newMessage];
+    }, randomInRange(1500, 4000));
+  }
+  
 
   socket.on('NEW_MESSAGE', newMessage => {
-    conversations[newClientId].push(newMessage);
+    conversations[clientId] = conversations[clientId]
+      ? conversations[clientId].concat(newMessage)
+      : [newMessage];
     console.log(conversations);
 
     setTimeout(() => {
@@ -56,7 +74,7 @@ io.on('connection', socket => {
 
       socket.emit('NEW_MESSAGE', newMessage);
 
-      conversations[newClientId].push(newMessage);
+      conversations[clientId].push(newMessage);
     }, randomInRange(5000, 6000));
   })
 
